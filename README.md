@@ -2,33 +2,37 @@
 
 [![GitHub Build Status](https://github.com/cisagov/cyhy-auditor-iam/workflows/build/badge.svg)](https://github.com/cisagov/cyhy-auditor-iam/actions)
 
-This is a generic skeleton project that can be used to quickly get a
-new [cisagov](https://github.com/cisagov) [Terraform
-module](https://www.terraform.io/docs/modules/index.html) GitHub
-repository started.  This skeleton project contains [licensing
-information](LICENSE), as well as [pre-commit
-hooks](https://pre-commit.com) and
-[GitHub Actions](https://github.com/features/actions) configurations
-appropriate for the major languages that we use.
+This project is used to manage IAM permissions for auditor users.
 
-See [here](https://www.terraform.io/docs/modules/index.html) for more
-details on Terraform modules and the standard module structure.
+## Pre-requisites ##
+
+- [Terraform](https://www.terraform.io/) installed on your system.
+- An accessible AWS S3 bucket to store Terraform state
+  (specified in [backend.tf](backend.tf)).
+- An accessible AWS DynamoDB database to store the Terraform state lock
+  (specified in [backend.tf](backend.tf)).
+- User accounts for all auditor users must have been created previously.  We
+  recommend using the
+  [`cisagov/cyhy-users-non-admin`](https://github.com/cisagov/cyhy-users-non-admin)
+  repository to create auditor user accounts.
 
 ## Usage ##
 
-```hcl
-module "example" {
-  source = "github.com/cisagov/cyhy-auditor-iam"
+1. Create a Terraform workspace (if you haven't already done so) by running
+   `terraform workspace new <workspace_name>`
+1. Create a `<workspace_name>.tfvars` file with all of the required
+  variables (see [Inputs](#inputs) below for details):
 
-  aws_region            = "us-west-1"
-  aws_availability_zone = "b"
-  subnet_id             = "subnet-0123456789abcdef0"
-}
-```
+  ```hcl
+  auditors = {
+    "firstname1.lastname1"    = { "roles" = ["security_audit"] },
+    "firstname2.lastname2"    = { "roles" = ["security_audit"] },
+  }
+  ```
 
-## Examples ##
-
-- [Basic usage](https://github.com/cisagov/cyhy-auditor-iam/tree/develop/examples/basic_usage)
+1. Run the command `terraform init`.
+1. Run the command `terraform apply
+  -var-file=<workspace_name>.tfvars`.
 
 ## Requirements ##
 
@@ -51,41 +55,35 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [aws_instance.example](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
-| [aws_ami.example](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
-| [aws_default_tags.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/default_tags) | data source |
+| [aws_iam_group.security_audit_users](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_group) | resource |
+| [aws_iam_group_policy_attachment.securityaudit_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_group_policy_attachment) | resource |
+| [aws_iam_group_policy_attachment.securityauditextras_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_group_policy_attachment) | resource |
+| [aws_iam_policy.securityauditextras_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_user_group_membership.security_audit](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_group_membership) | resource |
+| [aws_iam_policy_document.securityauditextras_doc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_user.auditors](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_user) | data source |
 
 ## Inputs ##
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| ami\_owner\_account\_id | The ID of the AWS account that owns the Example AMI, or "self" if the AMI is owned by the same account as the provisioner. | `string` | `"self"` | no |
-| aws\_availability\_zone | The AWS availability zone to deploy into (e.g. a, b, c, etc.). | `string` | `"a"` | no |
-| aws\_region | The AWS region to deploy into (e.g. us-east-1). | `string` | `"us-east-1"` | no |
-| subnet\_id | The ID of the AWS subnet to deploy into (e.g. subnet-0123456789abcdef0). | `string` | n/a | yes |
+| auditors | A map containing the usernames of each auditor and a list of audit roles assigned to that user.  The only currently-defined audit role is "security\_audit".  Example: { "firstname1.lastname1" = { "roles" = [ "security\_audit" ] }, "firstname2.lastname2" = { "roles" = [ "security\_audit" ] } }. | `map(object({ roles = list(string) }))` | n/a | yes |
+| aws\_region | The AWS region where the non-global resources are to be provisioned (e.g. "us-east-1"). | `string` | `"us-east-1"` | no |
+| security\_audit\_users\_group\_name | The name of the group to be created for security audit users. | `string` | `"security_auditors"` | no |
+| securityauditextras\_policy\_description | The description to associate with the IAM policy that gives access to additional permissions required by security auditors. | `string` | `"Allows access to additional resources required by security auditors."` | no |
+| securityauditextras\_policy\_name | The name to assign the IAM policy that gives access to additional permissions required by security auditors. | `string` | `"SecurityAuditExtras"` | no |
+| tags | Tags to apply to all AWS resources created. | `map(string)` | `{}` | no |
 
 ## Outputs ##
 
 | Name | Description |
 |------|-------------|
-| arn | The EC2 instance ARN. |
-| availability\_zone | The AZ where the EC2 instance is deployed. |
-| id | The EC2 instance ID. |
-| private\_ip | The private IP of the EC2 instance. |
-| subnet\_id | The ID of the subnet where the EC2 instance is deployed. |
+| security\_audit\_group | The group of security auditors. |
 
 ## Notes ##
 
 Running `pre-commit` requires running `terraform init` in every directory that
-contains Terraform code. In this repository, these are the main directory and
-every directory under `examples/`.
-
-## New Repositories from a Skeleton ##
-
-Please see our [Project Setup guide](https://github.com/cisagov/development-guide/tree/develop/project_setup)
-for step-by-step instructions on how to start a new repository from
-a skeleton. This will save you time and effort when configuring a
-new repository!
+contains Terraform code. In this repository, this is only the main directory.
 
 ## Contributing ##
 
