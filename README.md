@@ -67,7 +67,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| auditors | A map containing the usernames of each auditor and a list of audit roles assigned to that user.  The only currently-defined audit role is "security\_audit".  Example: { "firstname1.lastname1" = { "roles" = [ "security\_audit" ] }, "firstname2.lastname2" = { "roles" = [ "security\_audit" ] } }. | `map(map(list(string)))` | n/a | yes |
+| auditors | A map containing the usernames of each auditor and a list of audit roles assigned to that user.  The only currently-defined audit role is "security\_audit".  Example: { "firstname1.lastname1" = { "roles" = [ "security\_audit" ] }, "firstname2.lastname2" = { "roles" = [ "security\_audit" ] } }. | `map(object({ roles = list(string) }))` | n/a | yes |
 | aws\_region | The AWS region where the non-global resources are to be provisioned (e.g. "us-east-1"). | `string` | `"us-east-1"` | no |
 | security\_audit\_users\_group\_name | The name of the group to be created for security audit users. | `string` | `"security_auditors"` | no |
 | securityauditextras\_policy\_description | The description to associate with the IAM policy that gives access to additional permissions required by security auditors. | `string` | `"Allows access to additional resources required by security auditors."` | no |

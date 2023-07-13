@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------------
 
 variable "auditors" {
-  type        = map(map(list(string)))
+  type        = map(object({ roles = list(string) }))
   description = "A map containing the usernames of each auditor and a list of audit roles assigned to that user.  The only currently-defined audit role is \"security_audit\".  Example: { \"firstname1.lastname1\" = { \"roles\" = [ \"security_audit\" ] }, \"firstname2.lastname2\" = { \"roles\" = [ \"security_audit\" ] } }."
 }
 
