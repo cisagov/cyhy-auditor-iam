@@ -29,6 +29,6 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    # Managed by cisagov/cyhy-auditor-iam
+    # Managed by cisagov/skeleton-tf-module
     ignore:
       - dependency-name: "hashicorp/aws"
