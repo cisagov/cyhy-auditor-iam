@@ -34,18 +34,19 @@ This project is used to manage IAM permissions for auditor users.
 1. Run the command `terraform apply
   -var-file=<workspace_name>.tfvars`.
 
+<!-- BEGIN_TF_DOCS -->
 ## Requirements ##
 
 | Name | Version |
 |------|---------|
 | terraform | ~> 1.0 |
-| aws | ~> 3.38 |
+| aws | ~> 4.9 |
 
 ## Providers ##
 
 | Name | Version |
 |------|---------|
-| aws | ~> 3.38 |
+| aws | ~> 4.9 |
 
 ## Modules ##
 
@@ -79,6 +80,7 @@ No modules.
 | Name | Description |
 |------|-------------|
 | security\_audit\_group | The group of security auditors. |
+<!-- END_TF_DOCS -->
 
 ## Notes ##
 
