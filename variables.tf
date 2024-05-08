@@ -5,8 +5,8 @@
 # ------------------------------------------------------------------------------
 
 variable "auditors" {
-  type        = map(object({ roles = list(string) }))
   description = "A map containing the usernames of each auditor and a list of audit roles assigned to that user.  The only currently-defined audit role is \"security_audit\".  Example: { \"firstname1.lastname1\" = { \"roles\" = [ \"security_audit\" ] }, \"firstname2.lastname2\" = { \"roles\" = [ \"security_audit\" ] } }."
+  type        = map(object({ roles = list(string) }))
 }
 
 # ------------------------------------------------------------------------------
@@ -16,31 +16,31 @@ variable "auditors" {
 # ------------------------------------------------------------------------------
 
 variable "aws_region" {
-  type        = string
-  description = "The AWS region where the non-global resources are to be provisioned (e.g. \"us-east-1\")."
   default     = "us-east-1"
+  description = "The AWS region where the non-global resources are to be provisioned (e.g. \"us-east-1\")."
+  type        = string
 }
 
 variable "security_audit_users_group_name" {
-  type        = string
-  description = "The name of the group to be created for security audit users."
   default     = "security_auditors"
+  description = "The name of the group to be created for security audit users."
+  type        = string
 }
 
 variable "securityauditextras_policy_description" {
-  type        = string
-  description = "The description to associate with the IAM policy that gives access to additional permissions required by security auditors."
   default     = "Allows access to additional resources required by security auditors."
+  description = "The description to associate with the IAM policy that gives access to additional permissions required by security auditors."
+  type        = string
 }
 
 variable "securityauditextras_policy_name" {
-  type        = string
-  description = "The name to assign the IAM policy that gives access to additional permissions required by security auditors."
   default     = "SecurityAuditExtras"
+  description = "The name to assign the IAM policy that gives access to additional permissions required by security auditors."
+  type        = string
 }
 
 variable "tags" {
-  type        = map(string)
-  description = "Tags to apply to all AWS resources created."
   default     = {}
+  description = "Tags to apply to all AWS resources created."
+  type        = map(string)
 }
